@@ -29,6 +29,7 @@ func Load() error {
 	fmt.Printf("  Provider: %s\n", cfg.GetString("provider"))
 	fmt.Printf("  OpenAI Model: %s\n", cfg.GetString("openai.model"))
 	fmt.Printf("  Ollama URL: %s\n", cfg.GetString("ollama.url"))
+	fmt.Printf("  Ollama Model: %s\n", cfg.GetString("ollama.model"))
 
 	return nil
 }
