@@ -69,7 +69,7 @@ Use --rag to enable RAG-powered context-aware improvements that use your indexed
 			}
 
 			contextStr, err := ragService.SearchContext(ctx, fmt.Sprintf("Improve code: %s", filePath))
-			fmt.Println(contextStr)
+
 			if err != nil {
 				fmt.Printf("Warning: failed to get RAG context: %v\n", err)
 				contextStr = ""
