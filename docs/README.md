@@ -93,3 +93,19 @@ make lint
 # Iniciar ChromaDB
 make up
 ```
+
+## Licencia
+
+Este proyecto se distribuye bajo **GNU AGPL-3.0-only**. Consulta el archivo `LICENSE` en la raíz del repositorio.
+
+### Implicación para uso en red (SaaS)
+
+Si ejecutas una versión modificada y la ofreces como servicio por red, debes poner a disposición el código fuente modificado bajo la misma licencia.
+
+## Contribuciones
+
+Las contribuciones al proyecto se aceptan bajo **GNU AGPL-3.0-only**. Revisa `docs/CONTRIBUTING.md`.
+
+## Compatibilidad de dependencias (revisión inicial)
+
+No se detectan conflictos obvios de licencia con las dependencias directas actuales (Cobra, Viper, Testify, Godotenv, LangChain-go, Chroma-go), que usan licencias permisivas compatibles en este escenario.
