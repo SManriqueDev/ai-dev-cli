@@ -23,7 +23,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.6 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
@@ -33,7 +32,6 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/yalue/onnxruntime_go v1.19.0 // indirect
 	gitlab.com/golang-commonmark/html v0.0.0-20191124015941-a22733972181 // indirect
 	gitlab.com/golang-commonmark/linkify v0.0.0-20191026162114-a0c2df6c8f82 // indirect
 	gitlab.com/golang-commonmark/markdown v0.0.0-20211110145824-bf3e522c626a // indirect

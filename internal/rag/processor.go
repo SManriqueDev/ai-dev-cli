@@ -71,7 +71,6 @@ func (p *DocumentProcessor) ProcessDirectory(dirPath string) ([]schema.Document,
 		allDocs = append(allDocs, docs...)
 		return nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to walk directory: %w", err)
 	}
