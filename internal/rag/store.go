@@ -114,7 +114,7 @@ func FormatContext(docs []schema.Document) string {
 		if src, ok := doc.Metadata["source"].(string); ok {
 			source = src
 		}
-		ctx.WriteString(fmt.Sprintf("[Fragmento %d] (Fuente: %s)\n", i+1, source))
+		fmt.Fprintf(&ctx, "[Fragmento %d] (Fuente: %s)\n", i+1, source)
 		ctx.WriteString(doc.PageContent)
 		ctx.WriteString("\n\n---\n\n")
 	}
