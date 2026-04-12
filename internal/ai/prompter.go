@@ -34,7 +34,7 @@ You are a Go senior developer and code reviewer. Analyze the following code and 
 constructive improvements following Chain-of-Thought reasoning.
 
 {{if .Context}}
-=== CONtexto Recuperado de la Base de Datos Vectorial ===
+=== Contexto Recuperado de la Base de Datos Vectorial ===
 El siguiente contexto ha sido recuperado de la documentación indexada. Úsalo como referencia
 para entender las convenciones y patrones usados en este proyecto:
 
