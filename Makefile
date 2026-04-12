@@ -32,11 +32,6 @@ fmt:
 	go fmt ./...
 	gofumpt -w .
 
-run-improve:
-	go run . improve $(ARGS)
-
-run-test:
-	go run . test $(ARGS)
 
 run-coverage:
 	go test -coverprofile=coverage.out -coverpkg=./... ./...
@@ -65,8 +60,6 @@ help:
 	@echo "  make clean            - Remove build artifacts"
 	@echo "  make install-deps     - Download dependencies"
 	@echo "  make fmt              - Format code"
-	@echo "  make run-improve      - Run improve command (Usage: make run-improve ARGS=path/to/file.go)"
-	@echo "  make run-test         - Run test command (Usage: make run-test ARGS=path/to/file.go)"
 	@echo "  make run-coverage     - Run tests with coverage"
 	@echo "  make coverage-html    - Generate HTML report from coverage"
 	@echo "  make up               - Start ChromaDB with docker-compose"

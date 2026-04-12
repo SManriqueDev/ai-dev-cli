@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	chromago "github.com/amikos-tech/chroma-go"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/vectorstores"
@@ -36,16 +35,6 @@ func NewVectorStore(ctx context.Context, cfg VectorStoreConfig) (*VectorStore, e
 	collectionName := cfg.CollectionName
 	if collectionName == "" {
 		collectionName = "ai-dev-cli-db"
-	}
-
-	chromaclient, err := chromago.NewClient(chromaURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create chroma client: %w", err)
-	}
-
-	_, err = chromaclient.DeleteCollection(ctx, collectionName)
-	if err != nil {
-		fmt.Printf("Warning: failed to delete existing collection: %v\n", err)
 	}
 
 	opts := []chroma.Option{
