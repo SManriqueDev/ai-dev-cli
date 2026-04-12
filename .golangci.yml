@@ -1,0 +1,43 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gocyclo
+    - goconst
+    - misspell
+    - revive
+    - unconvert
+    - unparam
+    - nakedret
+    - bodyclose
+    - errorlint
+    - copyloopvar
+    - noctx
+    - gosec
+    - gocritic
+
+linters-settings:
+  revive:
+    enable-default-rules: true
+    rules:
+      - name: package-comments
+        disabled: true
+      - name: exported
+        disabled: false
+        arguments: [disableStuttering]
+  gosec:
+    excludes:
+      - G704
+      - G117
+      - G101
+  gocyclo:
+    min-complexity: 15
+
+issues:
+  new: true
