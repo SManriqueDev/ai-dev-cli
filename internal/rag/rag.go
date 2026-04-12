@@ -12,6 +12,7 @@ type RAGConfig struct {
 	Provider       string
 	EmbedderModel  string
 	APIKey         string
+	BaseURL        string
 	OllamaURL      string
 	ChunkSize      int
 	ChunkOverlap   int
@@ -48,6 +49,7 @@ func NewRAGService(ctx context.Context, cfg RAGConfig) (RAGService, error) {
 		Provider:  cfg.Provider,
 		Model:     cfg.EmbedderModel,
 		APIKey:    cfg.APIKey,
+		BaseURL:   cfg.BaseURL,
 		OllamaURL: cfg.OllamaURL,
 	})
 	if err != nil {

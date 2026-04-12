@@ -3,9 +3,9 @@ package rag
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
+	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/vectorstores"
@@ -26,15 +26,12 @@ type VectorStore struct {
 func NewVectorStore(ctx context.Context, cfg VectorStoreConfig) (*VectorStore, error) {
 	chromaURL := cfg.ChromaURL
 	if chromaURL == "" {
-		chromaURL = os.Getenv("CHROMA_URL")
-		if chromaURL == "" {
-			chromaURL = "http://localhost:8000"
-		}
+		chromaURL = config.DefaultChromaURL
 	}
 
 	collectionName := cfg.CollectionName
 	if collectionName == "" {
-		collectionName = "ai-dev-cli-db"
+		collectionName = config.DefaultCollectionName
 	}
 
 	opts := []chroma.Option{

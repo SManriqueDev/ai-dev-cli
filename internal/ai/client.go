@@ -3,8 +3,8 @@ package ai
 import (
 	"context"
 	"errors"
-	"os"
 
+	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 	"github.com/tmc/langchaingo/llms/openai"
@@ -21,27 +21,27 @@ type client struct {
 }
 
 func NewClient() (AIClient, error) {
-	provider := os.Getenv("AI_PROVIDER")
+	cfg := config.GetAIConfig()
 
-	switch provider {
+	switch cfg.Provider {
 	case "openai":
-		return newOpenAIClient()
+		return newOpenAIClient(cfg)
 	case "ollama":
-		return newOllamaClient()
+		return newOllamaClient(cfg)
 	default:
-		return newOpenAIClient()
+		return nil, errors.New("unsupported AI provider")
 	}
 }
 
-func newOpenAIClient() (AIClient, error) {
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
+func newOpenAIClient(cfg config.AIConfig) (AIClient, error) {
+	if cfg.APIKey == "" {
 		return nil, errors.New("OPENAI_API_KEY not set")
 	}
 
 	llm, err := openai.New(
-		openai.WithToken(apiKey),
-		openai.WithModel("gpt-4o"),
+		openai.WithToken(cfg.APIKey),
+		openai.WithModel(cfg.Model),
+		openai.WithBaseURL(cfg.BaseURL),
 	)
 	if err != nil {
 		return nil, err
@@ -50,14 +50,14 @@ func newOpenAIClient() (AIClient, error) {
 	return &client{llm: llm}, nil
 }
 
-func newOllamaClient() (AIClient, error) {
-	model := os.Getenv("OLLAMA_MODEL")
-	if model == "" {
-		model = "llama3.2"
+func newOllamaClient(cfg config.AIConfig) (AIClient, error) {
+	if cfg.Model == "" {
+		cfg.Model = config.DefaultOllamaModel
 	}
 
 	llm, err := ollama.New(
-		ollama.WithModel(model),
+		ollama.WithModel(cfg.Model),
+		ollama.WithServerURL(cfg.BaseURL),
 	)
 	if err != nil {
 		return nil, err

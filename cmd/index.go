@@ -3,22 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/ai-dev-cli/ai-dev-cli/internal/rag"
+	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
 	"github.com/spf13/cobra"
 )
-
-func getEmbedderModelByProvider(provider string) string {
-	switch provider {
-	case "openai":
-		return os.Getenv("OPENAI_EMBEDDER_MODEL")
-	case "ollama":
-		return os.Getenv("OLLAMA_EMBEDDER_MODEL")
-	default:
-		return os.Getenv("OPENAI_EMBEDDER_MODEL")
-	}
-}
 
 var (
 	indexPath         string
@@ -50,30 +39,27 @@ Examples:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
-		provider := indexProvider
-		if provider == "" {
-			provider = os.Getenv("AI_PROVIDER")
-			if provider == "" {
-				provider = "openai"
+		cfg := config.GetRAGConfig()
+		if cmd.Flags().Changed("provider") {
+			cfg.Provider = indexProvider
+			switch indexProvider {
+			case "openai":
+				cfg.EmbedderModel = config.GetString("openai.embedder_model")
+				cfg.APIKey = config.GetString("openai.api_key")
+				cfg.BaseURL = config.GetString("openai.base_url")
+			case "ollama":
+				cfg.EmbedderModel = config.GetString("ollama.embedder_model")
+				cfg.BaseURL = config.GetString("ollama.base_url")
+				cfg.OllamaURL = config.GetString("ollama.base_url")
 			}
 		}
-
-		cfg := rag.RAGConfig{
-			ChromaURL:      os.Getenv("CHROMA_URL"),
-			CollectionName: indexCollection,
-			Provider:       provider,
-			EmbedderModel:  getEmbedderModelByProvider(provider),
-			APIKey:         os.Getenv("OPENAI_API_KEY"),
-			OllamaURL:      os.Getenv("OLLAMA_BASE_URL"),
-			ChunkSize:      indexChunkSize,
-			ChunkOverlap:   indexChunkOverlap,
+		if cmd.Flags().Changed("collection") {
+			cfg.CollectionName = indexCollection
 		}
+		cfg.ChunkSize = indexChunkSize
+		cfg.ChunkOverlap = indexChunkOverlap
 
-		if cfg.CollectionName == "" {
-			cfg.CollectionName = "ai-dev-cli-db"
-		}
-
-		service, err := rag.NewRAGService(ctx, cfg)
+		service, err := rag.NewRAGService(ctx, rag.RAGConfig(cfg))
 		if err != nil {
 			return fmt.Errorf("failed to create RAG service: %w", err)
 		}

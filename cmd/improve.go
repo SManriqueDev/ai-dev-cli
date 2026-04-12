@@ -7,6 +7,7 @@ import (
 
 	"github.com/ai-dev-cli/ai-dev-cli/internal/ai"
 	"github.com/ai-dev-cli/ai-dev-cli/internal/rag"
+	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
 	"github.com/spf13/cobra"
 )
 
@@ -42,26 +43,22 @@ Use --rag to enable RAG-powered context-aware improvements that use your indexed
 		if useRAG {
 			ctx := context.Background()
 
-			provider := ragProvider
-			if provider == "" {
-				provider = os.Getenv("AI_PROVIDER")
-				if provider == "" {
-					provider = "openai"
+			ragCfg := rag.RAGConfig(config.GetRAGConfig())
+			if cmd.Flags().Changed("provider") && ragProvider != "" {
+				ragCfg.Provider = ragProvider
+				switch ragProvider {
+				case "openai":
+					ragCfg.EmbedderModel = config.GetString("openai.embedder_model")
+					ragCfg.APIKey = config.GetString("openai.api_key")
+					ragCfg.BaseURL = config.GetString("openai.base_url")
+				case "ollama":
+					ragCfg.EmbedderModel = config.GetString("ollama.embedder_model")
+					ragCfg.BaseURL = config.GetString("ollama.base_url")
+					ragCfg.OllamaURL = config.GetString("ollama.base_url")
 				}
 			}
-
-			collection := ragCollection
-			if collection == "" {
-				collection = "ai-dev-cli-db"
-			}
-
-			ragCfg := rag.RAGConfig{
-				ChromaURL:      os.Getenv("CHROMA_URL"),
-				CollectionName: collection,
-				Provider:       provider,
-				EmbedderModel:  os.Getenv("EMBEDDER_MODEL"),
-				APIKey:         os.Getenv("OPENAI_API_KEY"),
-				OllamaURL:      os.Getenv("OLLAMA_BASE_URL"),
+			if cmd.Flags().Changed("collection") {
+				ragCfg.CollectionName = ragCollection
 			}
 
 			ragService, err := rag.NewRAGService(ctx, ragCfg)

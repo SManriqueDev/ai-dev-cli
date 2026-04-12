@@ -3,8 +3,8 @@ package rag
 import (
 	"context"
 	"fmt"
-	"os"
 
+	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/llms/ollama"
 	"github.com/tmc/langchaingo/llms/openai"
@@ -20,28 +20,29 @@ type EmbedderConfig struct {
 }
 
 func NewEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embedder, error) {
+	if cfg.Provider == "" {
+		cfg.Provider = config.DefaultProvider
+	}
+
 	switch cfg.Provider {
 	case "openai":
 		return newOpenAIEmbedder(ctx, cfg)
 	case "ollama":
 		return newOllamaEmbedder(ctx, cfg)
 	default:
-		return newOpenAIEmbedder(ctx, cfg)
+		return nil, fmt.Errorf("unsupported embedder provider %q", cfg.Provider)
 	}
 }
 
 func newOpenAIEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embedder, error) {
 	modelName := cfg.Model
 	if modelName == "" {
-		modelName = getEnvWithDefault("OPENAI_EMBEDDER_MODEL", "text-embedding-3-small")
+		modelName = config.DefaultOpenAIEmbedderModel
 	}
 
 	baseURL := cfg.BaseURL
 	if baseURL == "" {
-		baseURL = os.Getenv("OPENAI_BASE_URL")
-		if baseURL == "" {
-			baseURL = "https://api.openai.com/v1"
-		}
+		baseURL = config.DefaultOpenAIBaseURL
 	}
 
 	opts := []openai.Option{
@@ -63,18 +64,13 @@ func newOpenAIEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embe
 func newOllamaEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embedder, error) {
 	modelName := cfg.Model
 	if modelName == "" {
-		modelName = getEnvWithDefault("OLLAMA_EMBEDDER_MODEL", "nomic-embed-text")
+		modelName = config.DefaultOllamaEmbedderModel
 	}
 
 	ollamaURL := cfg.OllamaURL
 	if ollamaURL == "" {
-		ollamaURL = os.Getenv("OLLAMA_BASE_URL")
-		if ollamaURL == "" {
-			ollamaURL = "http://localhost:11434"
-		}
+		ollamaURL = config.DefaultOllamaBaseURL
 	}
-
-	fmt.Printf("DEBUG: Creating Ollama embedder with model=%s, url=%s\n", modelName, ollamaURL)
 
 	opts := []ollama.Option{
 		ollama.WithModel(modelName),
@@ -86,18 +82,5 @@ func newOllamaEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embe
 		return nil, err
 	}
 
-	emb, err := embeddings.NewEmbedder(llm)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("DEBUG: Ollama embedder created successfully\n")
-	return emb, nil
-}
-
-func getEnvWithDefault(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
+	return embeddings.NewEmbedder(llm)
 }
