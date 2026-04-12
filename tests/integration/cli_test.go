@@ -26,6 +26,7 @@ func Add(a, b int) int {
 	tmpFile.Close()
 
 	cmd := exec.Command("go", "run", ".", "improve", tmpFile.Name())
+	cmd.Dir = "../.."
 	cmd.Env = append(os.Environ(), "OPENAI_API_KEY=test-key")
 	output, err := cmd.CombinedOutput()
 
