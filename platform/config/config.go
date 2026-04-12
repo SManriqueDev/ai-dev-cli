@@ -24,6 +24,8 @@ const (
 
 var cfg *viper.Viper
 
+const OLLAMA_PROVIDER = "ollama"
+
 type AppConfig struct {
 	Provider string
 	OpenAI   ProviderConfig
@@ -109,7 +111,7 @@ func Load() error {
 
 	setDefaults(cfg)
 
-	if provider := GetProvider(); provider != DefaultProvider && provider != "ollama" {
+	if provider := GetProvider(); provider != DefaultProvider && provider != OLLAMA_PROVIDER {
 		return fmt.Errorf("unsupported provider %q", provider)
 	}
 
@@ -170,7 +172,7 @@ func GetProvider() string {
 func GetAIConfig() AIConfig {
 	current := Current()
 	switch current.Provider {
-	case "ollama":
+	case OLLAMA_PROVIDER:
 		return AIConfig{
 			Provider: current.Provider,
 			BaseURL:  current.Ollama.BaseURL,
@@ -196,7 +198,7 @@ func GetChromaConfig() ChromaConfig {
 
 func getActiveEmbedderModel(provider string) string {
 	switch provider {
-	case "ollama":
+	case OLLAMA_PROVIDER:
 		return getString("ollama.embedder_model", DefaultOllamaEmbedderModel)
 	default:
 		return getString("openai.embedder_model", DefaultOpenAIEmbedderModel)

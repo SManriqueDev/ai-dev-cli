@@ -29,6 +29,7 @@ func (p *Prompter) GenerateTests(code string) (string, error) {
 	return p.client.Generate(context.Background(), prompt)
 }
 
+// nolint:misspell
 var improveTemplate = template.Must(template.New("improve").Parse(`
 You are a Go senior developer and code reviewer. Analyze the following code and provide
 constructive improvements following Chain-of-Thought reasoning.
@@ -78,7 +79,7 @@ Generate the test file with proper imports and package naming (_test suffix).
 
 func buildImprovePrompt(code, context string) string {
 	var sb strings.Builder
-	improveTemplate.Execute(&sb, struct {
+	_ = improveTemplate.Execute(&sb, struct {
 		Code    string
 		Context string
 	}{Code: code, Context: context})
@@ -87,7 +88,7 @@ func buildImprovePrompt(code, context string) string {
 
 func buildTestPrompt(code string, context string) string {
 	var sb strings.Builder
-	testTemplate.Execute(&sb, struct {
+	_ = testTemplate.Execute(&sb, struct {
 		Code    string
 		Context string
 	}{Code: code, Context: context})

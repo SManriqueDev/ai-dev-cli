@@ -1,9 +1,11 @@
 package rag
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,14 +36,15 @@ func NewDocumentProcessor(chunkSize, chunkOverlap int) *DocumentProcessor {
 }
 
 func (p *DocumentProcessor) ProcessFile(filePath string) ([]schema.Document, error) {
-	content, err := os.ReadFile(filePath)
+	cleanPath := filepath.Clean(filePath)
+	content, err := os.ReadFile(cleanPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file %s: %w", filePath, err)
+		return nil, fmt.Errorf("failed to read file %s: %w", cleanPath, err)
 	}
 
 	return p.processContent(string(content), map[string]any{
-		"source":    filePath,
-		"file_type": filepath.Ext(filePath),
+		"source":    cleanPath,
+		"file_type": filepath.Ext(cleanPath),
 	})
 }
 
@@ -78,12 +81,24 @@ func (p *DocumentProcessor) ProcessDirectory(dirPath string) ([]schema.Document,
 	return allDocs, nil
 }
 
-func (p *DocumentProcessor) ProcessURL(url string) ([]schema.Document, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch URL %s: %w", url, err)
+func (p *DocumentProcessor) ProcessURL(urlStr string) ([]schema.Document, error) {
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
+		return nil, fmt.Errorf("invalid or unsafe URL")
 	}
-	defer resp.Body.Close()
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// #nosec G107
+	resp, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch URL %s: %w", parsedURL.String(), err)
+	}
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to fetch URL: status %d", resp.StatusCode)
@@ -95,7 +110,7 @@ func (p *DocumentProcessor) ProcessURL(url string) ([]schema.Document, error) {
 	}
 
 	return p.processContent(string(content), map[string]any{
-		"source": url,
+		"source": parsedURL.String(),
 		"type":   "url",
 	})
 }

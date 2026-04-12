@@ -7,30 +7,36 @@ import (
 )
 
 func ReadFile(path string) (string, error) {
-	content, err := os.ReadFile(path)
+	cleanPath := filepath.Clean(path)
+
+	content, err := os.ReadFile(cleanPath)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file %s: %w", path, err)
+		return "", fmt.Errorf("failed to read file %s: %w", cleanPath, err)
 	}
 	return string(content), nil
 }
 
 func WriteFile(path string, content []byte) error {
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	cleanPath := filepath.Clean(path)
+	dir := filepath.Dir(cleanPath)
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", dir, err)
 	}
-	return os.WriteFile(path, content, 0o644)
+	return os.WriteFile(cleanPath, content, 0600)
 }
 
 func FileExists(path string) bool {
-	_, err := os.Stat(path)
+	cleanPath := filepath.Clean(path)
+	_, err := os.Stat(cleanPath)
 	return err == nil
 }
 
 func GetFileName(path string) string {
-	return filepath.Base(path)
+	cleanPath := filepath.Clean(path)
+	return filepath.Base(cleanPath)
 }
 
 func GetFileExt(path string) string {
-	return filepath.Ext(path)
+	cleanPath := filepath.Clean(path)
+	return filepath.Ext(cleanPath)
 }

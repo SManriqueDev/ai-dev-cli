@@ -26,15 +26,15 @@ func NewEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embedder, 
 
 	switch cfg.Provider {
 	case "openai":
-		return newOpenAIEmbedder(ctx, cfg)
+		return newOpenAIEmbedder(cfg)
 	case "ollama":
-		return newOllamaEmbedder(ctx, cfg)
+		return newOllamaEmbedder(cfg)
 	default:
 		return nil, fmt.Errorf("unsupported embedder provider %q", cfg.Provider)
 	}
 }
 
-func newOpenAIEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embedder, error) {
+func newOpenAIEmbedder(cfg EmbedderConfig) (embeddings.Embedder, error) {
 	modelName := cfg.Model
 	if modelName == "" {
 		modelName = config.DefaultOpenAIEmbedderModel
@@ -61,7 +61,7 @@ func newOpenAIEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embe
 	return embeddings.NewEmbedder(llm)
 }
 
-func newOllamaEmbedder(ctx context.Context, cfg EmbedderConfig) (embeddings.Embedder, error) {
+func newOllamaEmbedder(cfg EmbedderConfig) (embeddings.Embedder, error) {
 	modelName := cfg.Model
 	if modelName == "" {
 		modelName = config.DefaultOllamaEmbedderModel

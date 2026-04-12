@@ -1,7 +1,10 @@
 package config
 
 import (
+	"context"
+	"errors"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -12,11 +15,14 @@ type LinterResult struct {
 }
 
 func RunLinter(path string) (*LinterResult, error) {
-	cmd := exec.Command("golangci-lint", "run", "--new-from-rev=HEAD~", path)
+	cleanPath := filepath.Clean(path)
+	// #nosec G204
+	cmd := exec.CommandContext(context.Background(), "golangci-lint", "run", "--new-from-rev=HEAD~", "--", cleanPath)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
 			return &LinterResult{
 				Passed: exitErr.ExitCode() == 0,
 				Issues: parseLinterOutput(string(output)),

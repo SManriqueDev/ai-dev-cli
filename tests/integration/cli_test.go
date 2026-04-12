@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+const projectRoot = "../.."
+
 func TestCLI_ImproveCommand(t *testing.T) {
 	if os.Getenv("SKIP_INTEGRATION") == "1" {
 		t.Skip("Skipping integration test")
@@ -15,18 +17,28 @@ func TestCLI_ImproveCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(tmpFile.Name())
+	t.Cleanup(func() {
+		_ = os.Remove(tmpFile.Name())
+	})
 
-	tmpFile.WriteString(`package main
+	_, err = tmpFile.WriteString(`package main
 
 func Add(a, b int) int {
 	return a + b
 }
 `)
-	tmpFile.Close()
+	if err != nil {
+		t.Fatalf("failed to write to temp file: %v", err)
+	}
 
-	cmd := exec.Command("go", "run", ".", "improve", tmpFile.Name())
-	cmd.Dir = "../.."
+	t.Cleanup(func() {
+		_ = tmpFile.Close()
+		_ = os.Remove(tmpFile.Name())
+	})
+
+	cmd := exec.CommandContext(t.Context(), "go", "run", ".", "improve")
+	cmd.Args = append(cmd.Args, tmpFile.Name())
+	cmd.Dir = projectRoot
 	cmd.Env = append(os.Environ(), "OPENAI_API_KEY=test-key")
 	output, err := cmd.CombinedOutput()
 
@@ -45,17 +57,27 @@ func TestCLI_TestCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(tmpFile.Name())
+	t.Cleanup(func() {
+		_ = os.Remove(tmpFile.Name())
+	})
 
-	tmpFile.WriteString(`package main
+	_, err = tmpFile.WriteString(`package main
 
 func Multiply(a, b int) int {
 	return a * b
 }
 `)
-	tmpFile.Close()
+	if err != nil {
+		t.Fatalf("failed to write to temp file: %v", err)
+	}
 
-	cmd := exec.Command("go", "run", ".", "test", tmpFile.Name())
+	t.Cleanup(func() {
+		_ = tmpFile.Close()
+		_ = os.Remove(tmpFile.Name())
+	})
+
+	cmd := exec.CommandContext(t.Context(), "go", "run", ".", "test")
+	cmd.Args = append(cmd.Args, tmpFile.Name())
 	cmd.Dir = "../.."
 	cmd.Env = append(os.Environ(), "OPENAI_API_KEY=test-key")
 	output, err := cmd.CombinedOutput()
@@ -67,7 +89,7 @@ func Multiply(a, b int) int {
 }
 
 func TestCLI_HelpCommand(t *testing.T) {
-	cmd := exec.Command("go", "run", ".", "--help")
+	cmd := exec.CommandContext(t.Context(), "go", "run", ".", "--help")
 	cmd.Dir = "../.."
 	output, err := cmd.CombinedOutput()
 	if err != nil {

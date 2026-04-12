@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"charm.land/glamour/v2"
 	"github.com/ai-dev-cli/ai-dev-cli/internal/ai"
@@ -16,8 +17,8 @@ var testCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath := args[0]
-
-		content, err := os.ReadFile(filePath)
+		cleanPath := filepath.Clean(filePath)
+		content, err := os.ReadFile(cleanPath)
 		if err != nil {
 			return fmt.Errorf("failed to read file: %w", err)
 		}

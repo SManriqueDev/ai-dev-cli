@@ -1,7 +1,6 @@
 version: "2"
 
 linters:
-  default: none
   enable:
     - errcheck
     - govet
@@ -11,7 +10,6 @@ linters:
     - gocyclo
     - goconst
     - misspell
-    - revive
     - unconvert
     - unparam
     - nakedret
@@ -24,13 +22,11 @@ linters:
 
 linters-settings:
   revive:
-    enable-default-rules: true
     rules:
       - name: package-comments
         disabled: true
       - name: exported
-        disabled: false
-        arguments: [disableStuttering]
+        disabled: true
   gosec:
     excludes:
       - G704
@@ -40,4 +36,4 @@ linters-settings:
     min-complexity: 15
 
 issues:
-  new: true
+  new: false

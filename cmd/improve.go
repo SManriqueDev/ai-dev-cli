@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"charm.land/glamour/v2"
 
@@ -28,8 +29,8 @@ Use --rag to enable RAG-powered context-aware improvements that use your indexed
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath := args[0]
-
-		content, err := os.ReadFile(filePath)
+		cleanPath := filepath.Clean(filePath)
+		content, err := os.ReadFile(cleanPath)
 		if err != nil {
 			return fmt.Errorf("failed to read file: %w", err)
 		}
@@ -78,6 +79,10 @@ Use --rag to enable RAG-powered context-aware improvements that use your indexed
 			}
 
 			result, err = prompter.ImproveCodeWithContext(string(content), contextStr)
+
+			if err != nil {
+				return fmt.Errorf("failed to improve code with RAG context: %w", err)
+			}
 		} else {
 			result, err = prompter.ImproveCode(string(content))
 		}
