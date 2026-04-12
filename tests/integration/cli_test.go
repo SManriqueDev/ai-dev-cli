@@ -70,7 +70,6 @@ func TestCLI_HelpCommand(t *testing.T) {
 	cmd := exec.Command("go", "run", ".", "--help")
 	cmd.Dir = "../.."
 	output, err := cmd.CombinedOutput()
-
 	if err != nil {
 		t.Fatalf("Help command failed: %v", err)
 	}
