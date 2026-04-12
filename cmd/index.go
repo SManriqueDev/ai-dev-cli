@@ -9,6 +9,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func getEmbedderModelByProvider(provider string) string {
+	switch provider {
+	case "openai":
+		return os.Getenv("OPENAI_EMBEDDER_MODEL")
+	case "ollama":
+		return os.Getenv("OLLAMA_EMBEDDER_MODEL")
+	default:
+		return os.Getenv("OPENAI_EMBEDDER_MODEL")
+	}
+}
+
 var (
 	indexPath         string
 	indexURL          string
@@ -51,7 +62,7 @@ Examples:
 			ChromaURL:      os.Getenv("CHROMA_URL"),
 			CollectionName: indexCollection,
 			Provider:       provider,
-			EmbedderModel:  os.Getenv("EMBEDDER_MODEL"),
+			EmbedderModel:  getEmbedderModelByProvider(provider),
 			APIKey:         os.Getenv("OPENAI_API_KEY"),
 			OllamaURL:      os.Getenv("OLLAMA_BASE_URL"),
 			ChunkSize:      indexChunkSize,

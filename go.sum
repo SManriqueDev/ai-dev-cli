@@ -15,6 +15,10 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/amikos-tech/chroma-go v0.1.4 h1:MQXFBuKHOuZtlLOF6fLRb1VdXKKWp6TwdWxm6v/RUII=
 github.com/amikos-tech/chroma-go v0.1.4/go.mod h1:sT6uXOo/L5S/Q0v9jpYtoR1iOM68hUE2itWw8sOwLHY=
+github.com/amikos-tech/chroma-go v0.2.3 h1:sUsa36JSGPbQwZsn6jlbjJf+YGE2TXwXI1JJpcBs6R4=
+github.com/amikos-tech/chroma-go v0.2.3/go.mod h1:PCwTYNpy4JXYpEtC55TC3+RQzdRCsjLCWOsKazsyaSg=
+github.com/amikos-tech/chroma-go v0.2.4 h1:cJSHkD7WI7c24EGfS22bcgW5l8uDW4jRfPhWKP4Iuvo=
+github.com/amikos-tech/chroma-go v0.2.4/go.mod h1:Sy0YZ2C5RplQRx1Ztc99eOgI8IGVCLveihrvzJ6GuGg=
 github.com/amikos-tech/chroma-go v0.4.1 h1:WIcFTSjRgnVTYKWhgZYKaEUOjK6+BpGfVQRqdMIAfrw=
 github.com/amikos-tech/chroma-go v0.4.1/go.mod h1:q2kwMTUpWUP7ME3d7RjmVQlmBcJx9BKrrH7UhT91DRY=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
@@ -196,6 +200,8 @@ github.com/tklauser/numcpus v0.10.0/go.mod h1:BiTKazU708GQTYF4mB+cmlpT2Is1gLk7XV
 github.com/tklauser/numcpus v0.11.0 h1:nSTwhKH5e1dMNsCdVBukSZrURJRoHbSEQjdEbY+9RXw=
 github.com/tmc/langchaingo v0.1.14 h1:o1qWBPigAIuFvrG6cjTFo0cZPFEZ47ZqpOYMjM15yZc=
 github.com/tmc/langchaingo v0.1.14/go.mod h1:aKKYXYoqhIDEv7WKdpnnCLRaqXic69cX9MnDUk72378=
+github.com/yalue/onnxruntime_go v1.19.0 h1:+qCu7/Nzrr/TY7B3sMy9sOATegP2qbtXn4b7q90fDOo=
+github.com/yalue/onnxruntime_go v1.19.0/go.mod h1:b4X26A8pekNb1ACJ58wAXgNKeUCGEAQ9dmACut9Sm/4=
 github.com/yargevad/filepathx v1.0.0 h1:SYcT+N3tYGi+NvazubCNlvgIPbzAk7i7y2dwg3I5FYc=
 github.com/yargevad/filepathx v1.0.0/go.mod h1:BprfX/gpYNJHJfc35GjRRpVcwWXS89gGulUIU5tK3tA=
 github.com/yusufpapurcu/wmi v1.2.4 h1:zFUKzehAFReQwLys1b/iSMl+JQGSCSjtVqQn9bBrPo0=
