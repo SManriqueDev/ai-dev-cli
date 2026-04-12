@@ -33,10 +33,10 @@ fmt:
 	gofumpt -w .
 
 run-improve:
-	go run . improve
+	go run . improve $(ARGS)
 
 run-test:
-	go run . test
+	go run . test $(ARGS)
 
 help:
 	@echo "Available commands:"
@@ -49,5 +49,5 @@ help:
 	@echo "  make clean           - Remove build artifacts"
 	@echo "  make install-deps    - Download dependencies"
 	@echo "  make fmt             - Format code"
-	@echo "  make run-improve     - Run improve command"
-	@echo "  make run-test        - Run test command"
+	@echo "  make run-improve     - Run improve command (Usage: make run-improve ARGS=path/to/file.go)"
+	@echo "  make run-test        - Run test command (Usage: make run-test ARGS=path/to/file.go)"
