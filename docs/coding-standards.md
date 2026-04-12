@@ -228,6 +228,12 @@ default:
 }
 ```
 
+### Configuración
+
+- Evitar `os.Getenv` en consumidores; preferir `platform/config` como fuente única.
+- Cuando una opción dependa de `AI_PROVIDER`, usar variables específicas por provider (`OPENAI_*` / `OLLAMA_*`).
+- No introducir variables genéricas nuevas si ya existe un bloque de configuración por provider.
+
 ---
 
 ## Import Organization
@@ -264,8 +270,8 @@ import (
 Todas las funciones exportadas deben tener doc comments:
 
 ```go
-// NewClient creates a new AI client based on the AI_PROVIDER environment variable.
-// Returns an error if no provider is configured or if the client initialization fails.
+// NewClient creates a new AI client based on the active provider configuration.
+// Returns an error if the provider or client initialization fails.
 func NewClient() (AIClient, error) {
     // ...
 }

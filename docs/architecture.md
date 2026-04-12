@@ -173,7 +173,8 @@ El CLI debe permitir configuración flexible sin硬codificar valores.
 
 Usar **Viper** para configuración:
 - Lee de `.env` por defecto
-- Soporta flags, env vars, archivos YAML/JSON
+- Usa `platform/config` como fuente central de defaults y valores activos
+- Soporta flags y variables de entorno explícitamente vinculadas
 - Configuración hiérarchica
 
 ### Orden de Precedencia
@@ -182,3 +183,11 @@ Usar **Viper** para configuración:
 2. Variables de entorno
 3. Archivo de configuración
 4. Valores por defecto
+
+### Configuración por provider
+
+- `AI_PROVIDER` selecciona el bloque activo (`openai` u `ollama`)
+- OpenAI usa `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL` y `OPENAI_EMBEDDER_MODEL`
+- Ollama usa `OLLAMA_BASE_URL`, `OLLAMA_MODEL` y `OLLAMA_EMBEDDER_MODEL`
+- Chroma y RAG usan `CHROMA_URL`, `CHROMA_COLLECTION_NAME`, `RAG_CHUNK_SIZE` y `RAG_CHUNK_OVERLAP`
+- El proyecto no usa un `EMBEDDER_MODEL` genérico

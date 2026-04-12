@@ -58,6 +58,7 @@ func init() {
 - Leer de múltiples fuentes: env vars, flags, archivos
 - Hot reload de configuración
 - Valores por defecto
+- En este proyecto se usa detrás de `platform/config` con bindings explícitos por variable
 
 ### Uso Típico
 
@@ -76,6 +77,16 @@ if err := viper.ReadInConfig(); err != nil {
 ```go
 viper.SetEnvPrefix("APP")  // APP_* becomes viper keys
 ```
+
+### Patrón del proyecto
+
+El proyecto evita leer `os.Getenv` de forma directa en los consumidores. La configuración se centraliza en `platform/config` y expone defaults para:
+
+- `AI_PROVIDER`
+- `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_EMBEDDER_MODEL`
+- `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `OLLAMA_EMBEDDER_MODEL`
+- `CHROMA_URL`, `CHROMA_COLLECTION_NAME`
+- `RAG_CHUNK_SIZE`, `RAG_CHUNK_OVERLAP`
 
 ---
 
@@ -207,17 +218,16 @@ docs, _ := textsplitter.CreateDocuments(splitter, texts, metadatas)
 |----------|-------------|---------|
 | `AI_PROVIDER` | "openai" o "ollama" | "openai" |
 | `OPENAI_API_KEY` | API key de OpenAI | - |
-| `OLLAMA_MODEL` | Modelo de Ollama | "llama3.2" |
-| `OLLAMA_BASE_URL` | URL de Ollama | "http://localhost:11434" |
+| `OPENAI_BASE_URL` | URL base de OpenAI | `https://api.openai.com/v1` |
+| `OPENAI_MODEL` | Modelo de OpenAI | `gpt-4o` |
+| `OPENAI_EMBEDDER_MODEL` | Modelo de embeddings de OpenAI | `text-embedding-3-small` |
+| `OLLAMA_BASE_URL` | URL base de Ollama | `http://localhost:11434` |
+| `OLLAMA_MODEL` | Modelo de Ollama | `llama3.2` |
+| `OLLAMA_EMBEDDER_MODEL` | Modelo de embeddings de Ollama | `nomic-embed-text` |
 | `CHROMA_URL` | URL de ChromaDB | "http://localhost:8000" |
-
-### Embedding Models
-
-| Provider | Model | Dimensiones |
-|----------|-------|-------------|
-| OpenAI | text-embedding-3-small | 1536 |
-| OpenAI | text-embedding-3-large | 3072 |
-| Ollama | nomic-embed-text | 768 |
+| `CHROMA_COLLECTION_NAME` | Nombre de la colección | `ai-dev-cli-db` |
+| `RAG_CHUNK_SIZE` | Tamaño de chunk para RAG | `1000` |
+| `RAG_CHUNK_OVERLAP` | Solapamiento entre chunks | `200` |
 
 ---
 
