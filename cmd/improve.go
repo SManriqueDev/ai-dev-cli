@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"charm.land/glamour/v2"
+
 	"github.com/ai-dev-cli/ai-dev-cli/internal/ai"
 	"github.com/ai-dev-cli/ai-dev-cli/internal/rag"
 	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
@@ -83,7 +85,12 @@ Use --rag to enable RAG-powered context-aware improvements that use your indexed
 			return fmt.Errorf("failed to improve code: %w", err)
 		}
 
-		fmt.Println(result)
+		out, err := glamour.Render(result, "dark")
+		if err != nil {
+			return fmt.Errorf("failed to render output: %w", err)
+		}
+		fmt.Println(out)
+
 		return nil
 	},
 }

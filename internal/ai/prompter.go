@@ -25,7 +25,7 @@ func (p *Prompter) ImproveCodeWithContext(code, ragContext string) (string, erro
 }
 
 func (p *Prompter) GenerateTests(code string) (string, error) {
-	prompt := buildTestPrompt(code)
+	prompt := buildTestPrompt(code, "")
 	return p.client.Generate(context.Background(), prompt)
 }
 
@@ -85,8 +85,11 @@ func buildImprovePrompt(code, context string) string {
 	return sb.String()
 }
 
-func buildTestPrompt(code string) string {
+func buildTestPrompt(code string, context string) string {
 	var sb strings.Builder
-	testTemplate.Execute(&sb, struct{ Code string }{Code: code})
+	testTemplate.Execute(&sb, struct {
+		Code    string
+		Context string
+	}{Code: code, Context: context})
 	return sb.String()
 }

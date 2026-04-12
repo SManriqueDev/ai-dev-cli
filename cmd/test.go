@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"charm.land/glamour/v2"
 	"github.com/ai-dev-cli/ai-dev-cli/internal/ai"
 	"github.com/spf13/cobra"
 )
@@ -32,7 +33,12 @@ var testCmd = &cobra.Command{
 			return fmt.Errorf("failed to generate tests: %w", err)
 		}
 
-		fmt.Println(result)
+		out, err := glamour.Render(result, "dark")
+		if err != nil {
+			return fmt.Errorf("failed to render output: %w", err)
+		}
+		fmt.Println(out)
+
 		return nil
 	},
 }
