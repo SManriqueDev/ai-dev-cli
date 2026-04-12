@@ -38,6 +38,12 @@ run-improve:
 run-test:
 	go run . test $(ARGS)
 
+run-coverage:
+	go test -coverprofile=coverage.out -coverpkg=./... ./...
+
+coverage-html:
+	go tool cover -html=coverage.out
+
 up:
 	docker-compose up -d
 	@echo "ChromaDB is running at http://localhost:8000"
@@ -61,5 +67,7 @@ help:
 	@echo "  make fmt              - Format code"
 	@echo "  make run-improve      - Run improve command (Usage: make run-improve ARGS=path/to/file.go)"
 	@echo "  make run-test         - Run test command (Usage: make run-test ARGS=path/to/file.go)"
+	@echo "  make run-coverage     - Run tests with coverage"
+	@echo "  make coverage-html    - Generate HTML report from coverage"
 	@echo "  make up               - Start ChromaDB with docker-compose"
 	@echo "  make down             - Stop ChromaDB"

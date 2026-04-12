@@ -64,3 +64,16 @@ func TestPrompter_ImproveCode_Error(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorIs(t, err, context.DeadlineExceeded)
 }
+
+func TestPrompter_ImproveCodeWithContext(t *testing.T) {
+	mockClient := &MockAIClient{
+		Response: "improved code",
+	}
+	ragContext := "This is some relevant context about the project."
+
+	prompter := NewPrompter(mockClient)
+	result, err := prompter.ImproveCodeWithContext("func example() {}", ragContext)
+
+	require.NoError(t, err)
+	require.Equal(t, "improved code", result)
+}
