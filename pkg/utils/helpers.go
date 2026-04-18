@@ -19,10 +19,10 @@ func ReadFile(path string) (string, error) {
 func WriteFile(path string, content []byte) error {
 	cleanPath := filepath.Clean(path)
 	dir := filepath.Dir(cleanPath)
-	if err := os.MkdirAll(dir, 0750); err != nil {
+	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", dir, err)
 	}
-	return os.WriteFile(cleanPath, content, 0600)
+	return os.WriteFile(cleanPath, content, 0o600)
 }
 
 func FileExists(path string) bool {

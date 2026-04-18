@@ -2,8 +2,11 @@ package ai
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/ai-dev-cli/ai-dev-cli/internal/stream"
 )
 
 type Prompter struct {
@@ -27,6 +30,55 @@ func (p *Prompter) ImproveCodeWithContext(code, ragContext string) (string, erro
 func (p *Prompter) GenerateTests(code string) (string, error) {
 	prompt := buildTestPrompt(code, "")
 	return p.client.Generate(context.Background(), prompt)
+}
+
+// ImproveCodeStream streams code improvements using the provided StreamWriter.
+// Each chunk of the AI response is written to the writer as it arrives.
+func (p *Prompter) ImproveCodeStream(ctx context.Context, code string, writer stream.StreamWriter) error {
+	if writer == nil {
+		return fmt.Errorf("stream writer cannot be nil")
+	}
+
+	prompt := buildImprovePrompt(code, "")
+
+	// Use actual streaming from LangChain
+	_, err := p.client.GenerateStream(ctx, prompt, func(chunk string) error {
+		return writer.WriteChunk(ctx, []byte(chunk))
+	})
+
+	return err
+}
+
+// ImproveCodeStreamWithContext streams code improvements with RAG context.
+func (p *Prompter) ImproveCodeStreamWithContext(ctx context.Context, code, ragContext string, writer stream.StreamWriter) error {
+	if writer == nil {
+		return fmt.Errorf("stream writer cannot be nil")
+	}
+
+	prompt := buildImprovePrompt(code, ragContext)
+
+	// Use actual streaming from LangChain
+	_, err := p.client.GenerateStream(ctx, prompt, func(chunk string) error {
+		return writer.WriteChunk(ctx, []byte(chunk))
+	})
+
+	return err
+}
+
+// GenerateTestsStream streams test generation using the provided StreamWriter.
+func (p *Prompter) GenerateTestsStream(ctx context.Context, code string, writer stream.StreamWriter) error {
+	if writer == nil {
+		return fmt.Errorf("stream writer cannot be nil")
+	}
+
+	prompt := buildTestPrompt(code, "")
+
+	// Use actual streaming from LangChain
+	_, err := p.client.GenerateStream(ctx, prompt, func(chunk string) error {
+		return writer.WriteChunk(ctx, []byte(chunk))
+	})
+
+	return err
 }
 
 // nolint:misspell

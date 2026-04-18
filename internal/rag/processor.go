@@ -94,7 +94,6 @@ func (p *DocumentProcessor) ProcessURL(urlStr string) ([]schema.Document, error)
 
 	// #nosec G107
 	resp, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch URL %s: %w", parsedURL.String(), err)
 	}

@@ -18,6 +18,11 @@ var (
 	indexProvider     string
 )
 
+const (
+	providerOpenAI = "openai"
+	providerOllama = "ollama"
+)
+
 var indexCmd = &cobra.Command{
 	Use:   "index",
 	Short: "Index documents into the vector database",
@@ -43,11 +48,11 @@ Examples:
 		if cmd.Flags().Changed("provider") {
 			cfg.Provider = indexProvider
 			switch indexProvider {
-			case "openai":
+			case providerOpenAI:
 				cfg.EmbedderModel = config.GetString("openai.embedder_model")
 				cfg.APIKey = config.GetString("openai.api_key")
 				cfg.BaseURL = config.GetString("openai.base_url")
-			case "ollama":
+			case providerOllama:
 				cfg.EmbedderModel = config.GetString("ollama.embedder_model")
 				cfg.BaseURL = config.GetString("ollama.base_url")
 				cfg.OllamaURL = config.GetString("ollama.base_url")
