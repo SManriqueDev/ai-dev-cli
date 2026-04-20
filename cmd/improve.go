@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"sync"
 
-	"charm.land/glamour/v2"
-
 	"github.com/ai-dev-cli/ai-dev-cli/internal/ai"
+	"github.com/ai-dev-cli/ai-dev-cli/internal/output"
 	"github.com/ai-dev-cli/ai-dev-cli/internal/rag"
 	"github.com/ai-dev-cli/ai-dev-cli/internal/stream"
 	"github.com/ai-dev-cli/ai-dev-cli/platform/config"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 var (
@@ -21,6 +21,11 @@ var (
 	ragCollection string
 	ragProvider   string
 	useStream     bool
+	outputFormat  string
+	outputTheme   string
+	outputFile    string
+	showDiff      bool
+	applyMode     string
 )
 
 var improveCmd = &cobra.Command{
@@ -36,12 +41,12 @@ Use --stream to stream improvements in real-time as they are generated.`,
 		cleanPath := filepath.Clean(filePath)
 		content, err := os.ReadFile(cleanPath)
 		if err != nil {
-			return fmt.Errorf("failed to read file: %w", err)
+			return fmt.Errorf("failed to read file %s: check that the file exists and you have read permissions: %w", cleanPath, err)
 		}
 
 		client, err := ai.NewClient()
 		if err != nil {
-			return fmt.Errorf("failed to create AI client: %w", err)
+			return fmt.Errorf("failed to create AI client: check your OPENAI_API_KEY or OLLAMA_BASE_URL environment variables: %w", err)
 		}
 
 		prompter := ai.NewPrompter(client)
@@ -88,7 +93,6 @@ Use --stream to stream improvements in real-time as they are generated.`,
 			} else {
 				fmt.Println("Using RAG context from vector database")
 			}
-
 			result, err = prompter.ImproveCodeWithContext(string(content), contextStr)
 			if err != nil {
 				return fmt.Errorf("failed to improve code with RAG context: %w", err)
@@ -101,11 +105,77 @@ Use --stream to stream improvements in real-time as they are generated.`,
 			return fmt.Errorf("failed to improve code: %w", err)
 		}
 
-		out, err := glamour.Render(result, "dark")
-		if err != nil {
-			return fmt.Errorf("failed to render output: %w", err)
+		originalContent := string(content)
+
+		if showDiff {
+			diffOutput := output.FormatDiff(originalContent, result, isTerminal())
+			fmt.Println(diffOutput)
+		} else {
+			format := output.Format(outputFormat)
+			if format == "" {
+				format = output.FormatMarkdown
+			}
+			theme := output.Theme(outputTheme)
+			if theme == "" {
+				theme = output.ThemeDark
+			}
+
+			if outputFile != "" {
+				format = output.FormatPlain
+			}
+
+			formatter := output.NewFormatter(format, theme)
+			out, err := formatter.Format(output.OutputData{
+				Content:  result,
+				Original: originalContent,
+				Format:   string(format),
+			})
+			if err != nil {
+				return fmt.Errorf("failed to format output: %w", err)
+			}
+
+			if outputFile != "" {
+				err = os.WriteFile(outputFile, []byte(out), 0o600)
+				if err != nil {
+					return fmt.Errorf("failed to write output to %s: check directory exists and you have write permissions: %w", outputFile, err)
+				}
+				fmt.Printf("Saved to %s\n", outputFile)
+			} else {
+				fmt.Println(out)
+			}
 		}
-		fmt.Println(out)
+
+		if applyMode != "" {
+			shouldApply := false
+			if applyMode == "ask" {
+				fmt.Printf("Apply changes to %s? [y/N]: ", cleanPath)
+				var response string
+				_, _ = fmt.Scanln(&response)
+				shouldApply = response == "y" || response == "Y"
+			} else {
+				shouldApply = true
+			}
+
+			if !shouldApply {
+				fmt.Println("Apply cancelled.")
+				return nil
+			}
+
+			codeToApply := output.ExtractCodeFromMarkdown(result)
+			backupPath := cleanPath + ".bak"
+			err = os.WriteFile(backupPath, []byte(originalContent), 0o600)
+			if err != nil {
+				return fmt.Errorf("failed to create backup at %s: check write permissions in directory: %w", backupPath, err)
+			}
+			err = os.WriteFile(cleanPath, []byte(codeToApply), 0o600)
+			if err != nil {
+				return fmt.Errorf("failed to apply changes to %s: check write permissions: %w", cleanPath, err)
+			}
+
+			summary := output.ComputeChangeSummary(originalContent, codeToApply)
+			fmt.Printf("Applied changes to %s (backup: %s)\n", cleanPath, backupPath)
+			fmt.Printf("Changes: +%d lines, -%d lines\n", summary.LinesAdded, summary.LinesRemoved)
+		}
 
 		return nil
 	},
@@ -131,11 +201,20 @@ func (w *spinnerStoppingWriter) Close() error {
 	return w.inner.Close()
 }
 
+func isTerminal() bool {
+	return term.IsTerminal(int(os.Stdout.Fd()))
+}
+
 func init() {
 	improveCmd.Flags().BoolVar(&useRAG, "rag", false, "Enable RAG-powered context-aware improvements")
 	improveCmd.Flags().StringVar(&ragCollection, "collection", "ai-dev-cli-db", "RAG collection name")
 	improveCmd.Flags().StringVar(&ragProvider, "provider", "", "RAG provider: openai or ollama")
 	improveCmd.Flags().BoolVar(&useStream, "stream", false, "Stream improvements in real-time as they are generated")
+	improveCmd.Flags().StringVar(&outputFormat, "format", "markdown", "Output format: markdown, plain, json, yaml")
+	improveCmd.Flags().StringVar(&outputTheme, "theme", "dark", "Glamour theme: dark, light, auto")
+	improveCmd.Flags().StringVar(&outputFile, "output", "", "Output file path (default: stdout)")
+	improveCmd.Flags().BoolVar(&showDiff, "diff", false, "Show diff between original and improved code")
+	improveCmd.Flags().StringVar(&applyMode, "apply", "", "Apply changes to source file: use 'yes' for auto-apply, 'ask' for confirmation prompt")
 }
 
 // handleImproveStreaming handles the streaming improve command execution.

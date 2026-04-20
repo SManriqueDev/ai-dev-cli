@@ -3,17 +3,19 @@ module github.com/ai-dev-cli/ai-dev-cli
 go 1.25.8
 
 require (
-	github.com/amikos-tech/chroma-go v0.1.4
 	github.com/joho/godotenv v1.5.1
+	github.com/sergi/go-diff v1.3.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tmc/langchaingo v0.1.14
+	golang.org/x/term v0.34.0
 )
 
 require (
 	charm.land/lipgloss/v2 v2.0.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
+	github.com/amikos-tech/chroma-go v0.1.4 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.2 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20251205161215-1948445e3318 // indirect

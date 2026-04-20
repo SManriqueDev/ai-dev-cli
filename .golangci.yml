@@ -31,5 +31,8 @@ linters:
           disabled: true
         - name: unused-parameter
           disabled: true
+    gosec:
+      excludes:
+        - G115 # Type conversion which leads to integer overflow
       
       
